@@ -726,6 +726,7 @@ body {
   opacity: 0;
   visibility: hidden;
   transition: all var(--transition-fast);
+  overflow-y: auto;
 }
 
 .modal-backdrop.active {
@@ -748,6 +749,15 @@ body {
   transition: transform var(--transition-fast);
 }
 
+/* Garante que formulários dentro de modais respeitem a altura e permitam rolagem interna */
+.modal-dialog > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .modal-dialog.modal-lg { max-width: 950px; }
 .modal-dialog.modal-sm { max-width: 480px; }
 
@@ -762,6 +772,7 @@ body {
   align-items: center;
   justify-content: space-between;
   background: var(--bg-app);
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -791,8 +802,31 @@ body {
 
 .modal-body {
   padding: 24px;
-  overflow-y: auto;
-  flex: 1;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-500) var(--bg-app);
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 9px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: var(--bg-app);
+  border-radius: 6px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--primary-400);
+  border-radius: 6px;
+  border: 2px solid var(--bg-card);
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-600);
 }
 
 .modal-footer {
@@ -803,6 +837,7 @@ body {
   justify-content: flex-end;
   gap: 12px;
   background: var(--bg-app);
+  flex-shrink: 0;
 }
 
 /* Checklist de Serviços */

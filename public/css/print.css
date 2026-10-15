@@ -14,7 +14,8 @@
   .modal-close-btn,
   .modal-footer,
   .toast-container,
-  .no-print {
+  .no-print,
+  .modal-backdrop:not(.active) {
     display: none !important;
   }
 
@@ -31,10 +32,11 @@
     overflow: visible !important;
   }
 
-  .modal-backdrop {
+  .modal-backdrop.active {
     position: static !important;
     background: transparent !important;
     padding: 0 !important;
+    margin: 0 !important;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -121,78 +123,56 @@
 
   /* ==========================================================================
      FORMATO ESPECÍFICO: ETIQUETA DE PARA-BRISA (ADESIVO)
-     Tamanho aproximado: 70mm x 50mm
+     Tamanho aproximado: 90mm x 65mm
      ========================================================================== */
+  #modal-etiqueta-oleo.active .modal-dialog {
+    max-width: 95mm !important;
+    margin: 15mm auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  #modal-etiqueta-oleo.active .modal-body {
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
   .print-etiqueta-wrapper {
     display: block !important;
-    width: 85mm;
-    margin: 0 auto;
-    border: 2px dashed #064e3b;
-    border-radius: 8px;
-    padding: 10px;
-    background: #ffffff;
-    page-break-inside: avoid;
-    box-sizing: border-box;
+    width: 90mm !important;
+    margin: 0 auto !important;
+    border: 2px dashed #064e3b !important;
+    border-radius: 8px !important;
+    padding: 10px 12px !important;
+    background: #ffffff !important;
+    page-break-inside: avoid !important;
+    box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   .etiqueta-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-bottom: 1px solid #064e3b;
-    padding-bottom: 6px;
-    margin-bottom: 8px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    border-bottom: 2px solid #064e3b !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 8px !important;
   }
 
-  .etiqueta-logo {
-    max-height: 32px;
+  .etiqueta-proxima-box {
+    background: #064e3b !important;
+    color: #ffffff !important;
+    border: 2px solid #047857 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
-  .etiqueta-title {
-    font-size: 8pt;
-    font-weight: bold;
-    color: #064e3b;
-    line-height: 1.1;
-  }
-
-  .etiqueta-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    font-size: 8pt;
-  }
-
-  .etiqueta-field {
-    border: 1px solid #cbd5e1;
-    border-radius: 4px;
-    padding: 4px 6px;
-    background: #f8fafc;
-  }
-
-  .etiqueta-field-highlight {
-    background: #ecfdf5;
-    border-color: #059669;
-    grid-column: span 2;
-  }
-
-  .etiqueta-field-label {
-    font-size: 6.5pt;
-    color: #475569;
-    text-transform: uppercase;
-    font-weight: bold;
-  }
-
-  .etiqueta-field-val {
-    font-size: 9pt;
-    font-weight: bold;
-    color: #0f172a;
-  }
-
-  .etiqueta-footer {
-    font-size: 6.5pt;
-    text-align: center;
-    margin-top: 6px;
-    color: #64748b;
+  .etiqueta-proxima-box span {
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 

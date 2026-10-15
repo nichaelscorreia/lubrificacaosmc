@@ -615,16 +615,11 @@
             </div>
           </div>
 
-          <!-- Dados do Serviço -->
+          <!-- Dados Básicos do Serviço -->
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Data do Serviço *</label>
               <input type="date" id="troca-data-servico" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">KM Registrado no Odômetro *</label>
-              <input type="number" id="troca-km-registrado" class="form-control" placeholder="Ex: 45000" required>
             </div>
 
             <div class="form-group">
@@ -636,9 +631,7 @@
                 <option value="EMERGENCIAL">Emergencial</option>
               </select>
             </div>
-          </div>
 
-          <div class="form-row">
             <div class="form-group">
               <label class="form-label">Mecânico / Lubrificador Responsável</label>
               <input type="text" id="troca-mecanico" class="form-control" value="Oficina / Garagem Central SMC">
@@ -647,6 +640,37 @@
             <div class="form-group">
               <label class="form-label">Local de Execução</label>
               <input type="text" id="troca-local-execucao" class="form-control" value="Garagem Central SMC">
+            </div>
+          </div>
+
+          <!-- BLOCO DE DESTAQUE: CONTROLE DE ODÔMETRO E PRÓXIMA TROCA -->
+          <div style="background: rgba(5, 150, 105, 0.07); border: 2px solid var(--primary-500); border-radius: var(--radius-md); padding: 16px; margin: 16px 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--primary-800); font-size: 0.96rem;">
+                <i data-lucide="gauge" style="width: 20px; height: 20px; color: var(--primary-600);"></i>
+                <span>Controle de Quilometragem e Próxima Troca</span>
+              </div>
+              <span id="badge-intervalo-troca" class="badge badge-success" style="font-size: 0.78rem; padding: 4px 10px;">Intervalo Padrão: +10.000 km / 6 meses</span>
+            </div>
+
+            <div class="form-row" style="margin-bottom: 0;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 700;">KM Atual no Odômetro *</label>
+                <input type="number" id="troca-km-registrado" class="form-control" placeholder="Ex: 45000" style="font-size: 1.12rem; font-weight: 700;" required>
+                <small style="color: var(--text-muted); font-size: 0.75rem;">KM registrado no ato do serviço</small>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 800; color: var(--primary-800);">KM da Próxima Troca (Alvo) *</label>
+                <input type="number" id="troca-km-proxima" class="form-control" style="font-size: 1.15rem; font-weight: 900; color: #064e3b; background: #ecfdf5; border: 2px solid var(--primary-600);" placeholder="Calculado automaticamente" required>
+                <small id="ajuda-km-proxima" style="color: var(--primary-700); font-size: 0.75rem; font-weight: 600;">Calculado automaticamente (KM Atual + Intervalo)</small>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 700;">Data Limite Próxima Troca *</label>
+                <input type="date" id="troca-data-proxima" class="form-control" style="font-size: 1rem; font-weight: 600;" required>
+                <small style="color: var(--text-muted); font-size: 0.75rem;">Prazo máximo de validade temporal</small>
+              </div>
             </div>
           </div>
 
@@ -728,20 +752,10 @@
             <input type="hidden" id="troca-valor-total" value="0">
           </div>
 
-          <!-- Previsão da Próxima Troca -->
+          <!-- Checklist e Observações Finais -->
           <div class="form-row" style="margin-top: 16px;">
-            <div class="form-group">
-              <label class="form-label">Próxima Troca Prevista (KM)</label>
-              <input type="number" id="troca-km-proxima" class="form-control" placeholder="Calculado automaticamente">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Próxima Troca Prevista (Data Limite)</label>
-              <input type="date" id="troca-data-proxima" class="form-control">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Inspeção Geral / Checklist</label>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label">Inspeção Geral / Laudo Técnico</label>
               <select id="troca-checklist-status" class="form-select">
                 <option value="APROVADO">Aprovado sem Observações</option>
                 <option value="COM_OBSERVACOES">Aprovado com Ressalvas</option>
@@ -751,7 +765,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Observações Técnicas / Laudo</label>
+            <label class="form-label">Observações Técnicas / Orientações</label>
             <textarea id="troca-observacoes" class="form-control" rows="2" placeholder="Observações sobre anel de vedação, estado de correias, vazamentos ou orientações ao motorista..."></textarea>
           </div>
         </div>
@@ -900,56 +914,63 @@
       </div>
 
       <div class="modal-body" style="padding: 20px;">
-        <!-- Card Etiqueta Formatado para Adesivo -->
-        <div class="print-etiqueta-wrapper" style="border: 2px dashed var(--primary-600); border-radius: 10px; padding: 14px; background: #ffffff; color: #0f172a; box-shadow: var(--shadow-sm);">
+        <!-- Card Etiqueta Formatado para Adesivo de Para-brisa -->
+        <div class="print-etiqueta-wrapper" style="border: 2px dashed #064e3b; border-radius: 10px; padding: 14px; background: #ffffff; color: #0f172a; box-shadow: var(--shadow-sm); width: 340px; margin: 0 auto;">
           <div class="etiqueta-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #064e3b; padding-bottom: 8px; margin-bottom: 10px;">
             <img src="/assets/logo.png" style="max-height: 38px;" alt="SMC">
             <div style="text-align: right;">
-              <div style="font-size: 9pt; font-weight: 800; color: #064e3b; text-transform: uppercase;">CONTROLE DE ÓLEO</div>
-              <div style="font-size: 7pt; color: #64748b;">São Miguel dos Campos - AL</div>
+              <div style="font-size: 8.5pt; font-weight: 800; color: #064e3b; text-transform: uppercase; letter-spacing: 0.5px;">CONTROLE DE ÓLEO</div>
+              <div style="font-size: 7pt; color: #475569; font-weight: 600;">São Miguel dos Campos - AL</div>
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 8.5pt;">
-            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px;">
-              <div style="font-size: 6.5pt; color: #64748b; font-weight: bold;">PLACA</div>
-              <div id="lbl-etiqueta-placa" style="font-size: 11pt; font-weight: 800; color: #0f172a;">-</div>
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 5px 8px; border-radius: 5px;">
+              <div style="font-size: 6.5pt; color: #475569; font-weight: 800; text-transform: uppercase;">PLACA DO VEÍCULO</div>
+              <div id="lbl-etiqueta-placa" style="font-size: 12pt; font-weight: 900; color: #0f172a; letter-spacing: 0.5px;">-</div>
             </div>
 
-            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px;">
-              <div style="font-size: 6.5pt; color: #64748b; font-weight: bold;">Nº DA O.S.</div>
-              <div id="lbl-etiqueta-os" style="font-size: 9pt; font-weight: bold; color: #064e3b;">-</div>
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 5px 8px; border-radius: 5px;">
+              <div style="font-size: 6.5pt; color: #475569; font-weight: 800; text-transform: uppercase;">Nº DA O.S.</div>
+              <div id="lbl-etiqueta-os" style="font-size: 9.5pt; font-weight: 800; color: #064e3b;">-</div>
             </div>
 
-            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px;">
-              <div style="font-size: 6.5pt; color: #64748b; font-weight: bold;">DATA DA TROCA</div>
-              <div id="lbl-etiqueta-data-troca" style="font-size: 9.5pt; font-weight: bold;">-</div>
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 5px 8px; border-radius: 5px;">
+              <div style="font-size: 6.5pt; color: #475569; font-weight: 800; text-transform: uppercase;">DATA DA TROCA</div>
+              <div id="lbl-etiqueta-data-troca" style="font-size: 9.5pt; font-weight: 800; color: #0f172a;">-</div>
             </div>
 
-            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px;">
-              <div style="font-size: 6.5pt; color: #64748b; font-weight: bold;">KM DA TROCA</div>
-              <div id="lbl-etiqueta-km-troca" style="font-size: 9.5pt; font-weight: bold;">-</div>
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 5px 8px; border-radius: 5px;">
+              <div style="font-size: 6.5pt; color: #475569; font-weight: 800; text-transform: uppercase;">KM DA TROCA</div>
+              <div id="lbl-etiqueta-km-troca" style="font-size: 9.5pt; font-weight: 800; color: #0f172a;">-</div>
             </div>
 
-            <!-- Destaque Próxima Troca -->
-            <div style="grid-column: span 2; background: #ecfdf5; border: 1.5px solid #059669; padding: 8px 10px; border-radius: 6px; text-align: center;">
-              <div style="font-size: 7pt; color: #065f46; font-weight: 800; text-transform: uppercase;">PRÓXIMA TROCA DE ÓLEO</div>
-              <div style="display: flex; justify-content: space-around; margin-top: 4px;">
+            <!-- DESTAQUE MÁXIMO: PRÓXIMA TROCA DE ÓLEO (VISÍVEL NO PARA-BRISA) -->
+            <div class="etiqueta-proxima-box" style="grid-column: span 2; background: #064e3b; color: #ffffff; padding: 10px 12px; border-radius: 8px; text-align: center; border: 2px solid #047857;">
+              <div style="font-size: 8pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.95;">PRÓXIMA TROCA DE ÓLEO</div>
+              <div style="display: flex; align-items: center; justify-content: space-around; margin: 6px 0;">
                 <div>
-                  <span style="font-size: 6.5pt; color: #047857; display: block;">KM LIMITE:</span>
-                  <span id="lbl-etiqueta-km-prox" style="font-size: 12pt; font-weight: 900; color: #064e3b;">-</span>
+                  <span style="font-size: 7pt; text-transform: uppercase; display: block; opacity: 0.85;">TROCAR AOS:</span>
+                  <span id="lbl-etiqueta-km-prox" style="font-size: 15pt; font-weight: 900; letter-spacing: 0.5px; color: #ffffff;">-</span>
                 </div>
-                <div style="border-left: 1px solid #a7f3d0; padding-left: 12px;">
-                  <span style="font-size: 6.5pt; color: #047857; display: block;">DATA LIMITE:</span>
-                  <span id="lbl-etiqueta-data-prox" style="font-size: 11pt; font-weight: 800; color: #064e3b;">-</span>
+                <div style="height: 34px; width: 1px; background: rgba(255,255,255,0.35);"></div>
+                <div>
+                  <span style="font-size: 7pt; text-transform: uppercase; display: block; opacity: 0.85;">OU ATÉ:</span>
+                  <span id="lbl-etiqueta-data-prox" style="font-size: 12pt; font-weight: 800; color: #ffffff;">-</span>
                 </div>
               </div>
+              <div style="font-size: 6.5pt; opacity: 0.85;">(O QUE OCORRER PRIMEIRO)</div>
             </div>
 
-            <div style="grid-column: span 2; font-size: 7pt; color: #64748b; padding-top: 4px; border-top: 1px solid #e2e8f0;">
-              <div><strong>Veículo:</strong> <span id="lbl-etiqueta-modelo">-</span> | <span id="lbl-etiqueta-secretaria">-</span></div>
-              <div><strong>Insumos:</strong> <span id="lbl-etiqueta-itens">-</span></div>
-              <div style="margin-top: 2px;"><strong>Mecânico:</strong> <span id="lbl-etiqueta-mecanico">-</span></div>
+            <div style="grid-column: span 2; font-size: 7.5pt; color: #475569; padding-top: 6px; border-top: 1px solid #e2e8f0; line-height: 1.45;">
+              <div><strong>Veículo:</strong> <span id="lbl-etiqueta-modelo">-</span> (<span id="lbl-etiqueta-secretaria">-</span>)</div>
+              <div><strong>Óleo / Insumos:</strong> <span id="lbl-etiqueta-itens">-</span></div>
+              <div><strong>Filtros Trocados:</strong> <span id="lbl-etiqueta-filtros" style="font-weight: 700; color: #064e3b;">-</span></div>
+              <div style="margin-top: 2px;"><strong>Mecânico Responsável:</strong> <span id="lbl-etiqueta-mecanico">-</span></div>
+            </div>
+            
+            <div style="grid-column: span 2; text-align: center; font-size: 6.5pt; color: #64748b; font-style: italic; border-top: 1px dashed #cbd5e1; padding-top: 5px;">
+              * Fixar no canto do para-brisa • Garagem Central de Frota SMC *
             </div>
           </div>
         </div>

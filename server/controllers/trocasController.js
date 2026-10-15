@@ -466,10 +466,15 @@ async function getEtiqueta(req, res) {
         v.MODELO_VEICULO,
         v.SECRETARIA,
         TO_CHAR(t.DATA_SERVICO, 'DD/MM/YYYY') AS DATA_TROCA_BR,
-        t.KM_REGISTRADO AS KM_TROCA,
-        t.KM_PROXIMA_TROCA AS KM_PROXIMA,
-        TO_CHAR(t.DATA_PROXIMA_TROCA, 'DD/MM/YYYY') AS DATA_PROXIMA_BR,
+        NVL(t.KM_REGISTRADO, 0) AS KM_TROCA,
+        NVL(t.KM_PROXIMA_TROCA, NVL(t.KM_REGISTRADO, 0) + 10000) AS KM_PROXIMA,
+        TO_CHAR(NVL(t.DATA_PROXIMA_TROCA, ADD_MONTHS(t.DATA_SERVICO, 6)), 'DD/MM/YYYY') AS DATA_PROXIMA_BR,
         t.MECANICO_RESPONSAVEL,
+        t.TROCOU_OLEO_MOTOR,
+        t.TROCOU_FILTRO_OLEO,
+        t.TROCOU_FILTRO_AR,
+        t.TROCOU_FILTRO_COMBUSTIVEL,
+        t.TROCOU_FILTRO_CABINE,
         (
           SELECT LISTAGG(i.DESCRICAO_ITEM, ', ') WITHIN GROUP (ORDER BY i.ID_ITEM)
           FROM LUB_ITENS_TROCA i
@@ -484,9 +489,14 @@ async function getEtiqueta(req, res) {
       return res.status(404).json({ success: false, message: 'Ordem de serviço não encontrada.' });
     }
 
+    const etiqueta = result.rows[0];
+    if (etiqueta.KM_PROXIMA <= etiqueta.KM_TROCA) {
+      etiqueta.KM_PROXIMA = etiqueta.KM_TROCA + 10000;
+    }
+
     return res.json({
       success: true,
-      etiqueta: result.rows[0]
+      etiqueta
     });
   } catch (err) {
     console.error('Erro ao gerar etiqueta de óleo:', err);

@@ -216,6 +216,13 @@ const Trocas = {
       document.getElementById('troca-card-carter').textContent = v.CAPACIDADE_CARTER_LITROS ? `${v.CAPACIDADE_CARTER_LITROS} Litros` : '-';
     }
 
+    const intervaloKm = parseInt(v.INTERVALO_KM) || 10000;
+    const intervaloMeses = parseInt(v.INTERVALO_MESES) || 6;
+    const badgeIntervalo = document.getElementById('badge-intervalo-troca');
+    if (badgeIntervalo) {
+      badgeIntervalo.textContent = `Intervalo: +${Format.number(intervaloKm)} km / ${intervaloMeses} meses`;
+    }
+
     // Preenche KM sugerido
     const kmInput = document.getElementById('troca-km-registrado');
     if (kmInput && (!kmInput.value || parseInt(kmInput.value) === 0)) {
@@ -270,16 +277,25 @@ const Trocas = {
   },
 
   calcularPrevisaoProximaTroca() {
-    const kmAtual = parseInt(document.getElementById('troca-km-registrado').value) || 0;
+    const kmRegistradoEl = document.getElementById('troca-km-registrado');
+    const kmAtual = parseInt(kmRegistradoEl ? kmRegistradoEl.value : 0) || 0;
     const dataServicoStr = document.getElementById('troca-data-servico').value;
 
     const v = this.currentVeiculoSelecionado;
-    const intervaloKm = v?.INTERVALO_KM || 10000;
-    const intervaloMeses = v?.INTERVALO_MESES || 6;
+    const intervaloKm = (v && v.INTERVALO_KM) ? parseInt(v.INTERVALO_KM) : 10000;
+    const intervaloMeses = (v && v.INTERVALO_MESES) ? parseInt(v.INTERVALO_MESES) : 6;
 
     const kmProxInput = document.getElementById('troca-km-proxima');
+    const kmAlvo = kmAtual + intervaloKm;
     if (kmProxInput) {
-      kmProxInput.value = kmAtual + intervaloKm;
+      kmProxInput.value = kmAlvo;
+    }
+
+    const ajudaKmProx = document.getElementById('ajuda-km-proxima');
+    if (ajudaKmProx) {
+      ajudaKmProx.textContent = kmAtual > 0
+        ? `Previsão: ${Format.number(kmAtual)} km + ${Format.number(intervaloKm)} km = ${Format.number(kmAlvo)} km`
+        : `Intervalo padrão: +${Format.number(intervaloKm)} km`;
     }
 
     const dataProxInput = document.getElementById('troca-data-proxima');
@@ -419,10 +435,16 @@ const Trocas = {
         }
       });
 
+      const kmRegistrado = parseInt(document.getElementById('troca-km-registrado').value) || 0;
+      let kmProximaTroca = parseInt(document.getElementById('troca-km-proxima').value) || null;
+      if (!kmProximaTroca && kmRegistrado > 0) {
+        kmProximaTroca = kmRegistrado + 10000;
+      }
+
       const payload = {
         codigoVeiculo: parseInt(codigoVeiculo),
         dataServico: document.getElementById('troca-data-servico').value,
-        kmRegistrado: parseInt(document.getElementById('troca-km-registrado').value) || 0,
+        kmRegistrado: kmRegistrado,
         horasRegistrado: parseInt(document.getElementById('troca-horas-registrado')?.value) || 0,
         tipoServico: document.getElementById('troca-tipo-servico').value,
         localExecucao: document.getElementById('troca-local-execucao').value,
@@ -437,7 +459,7 @@ const Trocas = {
         trocouOleoDiferencial: document.getElementById('chk-oleo-diferencial').checked,
         trocouFluidoFreio: document.getElementById('chk-fluido-freio').checked,
         trocouArrefecimento: document.getElementById('chk-arrefecimento').checked,
-        kmProximaTroca: parseInt(document.getElementById('troca-km-proxima').value) || null,
+        kmProximaTroca: kmProximaTroca,
         dataProximaTroca: document.getElementById('troca-data-proxima').value || null,
         valorTotalServico: parseFloat(document.getElementById('troca-valor-total').value) || 0,
         checklistStatus: document.getElementById('troca-checklist-status').value,
@@ -564,6 +586,16 @@ const Trocas = {
       document.getElementById('lbl-etiqueta-data-prox').textContent = e.DATA_PROXIMA_BR || '-';
       document.getElementById('lbl-etiqueta-mecanico').textContent = e.MECANICO_RESPONSAVEL || 'Oficina SMC';
       document.getElementById('lbl-etiqueta-itens').textContent = e.ITENS_RESUMO || 'Óleo e filtros trocados';
+
+      const filtros = [];
+      if (e.TROCOU_FILTRO_OLEO) filtros.push('Óleo');
+      if (e.TROCOU_FILTRO_AR) filtros.push('Ar');
+      if (e.TROCOU_FILTRO_COMBUSTIVEL) filtros.push('Combustível');
+      if (e.TROCOU_FILTRO_CABINE) filtros.push('Cabine');
+      const filtrosEl = document.getElementById('lbl-etiqueta-filtros');
+      if (filtrosEl) {
+        filtrosEl.textContent = filtros.length > 0 ? filtros.join(', ') : 'Nenhum filtro trocado';
+      }
 
       App.openModal('modal-etiqueta-oleo');
     } catch (err) {
