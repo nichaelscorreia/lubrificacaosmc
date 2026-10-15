@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Controle de Lubrificação | Prefeitura de São Miguel dos Campos</title>
+  <meta name="description" content="Sistema institucional para gestão de troca de óleo e manutenção preventiva da frota municipal de São Miguel dos Campos.">
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Estilos da Aplicação -->
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/print.css">
+</head>
+<body>
+
+  <!-- ==========================================
+       TELA DE LOGIN INSTITUCIONAL
+       ========================================== -->
+  <div id="login-view" class="login-page">
+    <div class="login-card">
+      <img src="/assets/logo.png" alt="Prefeitura de São Miguel dos Campos" class="login-logo">
+      <h1 class="login-header-title">Controle de Lubrificação</h1>
+      <p class="login-header-subtitle">Gestão de Troca de Óleo e Manutenção da Frota Municipal</p>
+
+      <form id="form-login">
+        <div class="form-group" style="text-align: left;">
+          <label for="login-username" class="form-label">Usuário de Acesso</label>
+          <input type="text" id="login-username" class="form-control" placeholder="Informe seu usuário" required autofocus>
+        </div>
+
+        <div class="form-group" style="text-align: left;">
+          <label for="login-password" class="form-label">Senha</label>
+          <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">
+          <i data-lucide="log-in" style="width: 18px; height: 18px;"></i> Acessar Sistema
+        </button>
+      </form>
+
+      <div style="margin-top: 24px; font-size: 0.75rem; color: var(--text-muted);">
+        Prefeitura Municipal de São Miguel dos Campos - AL<br>
+        Ambiente Seguro Integrado ao Banco de Dados Oracle
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       APLICAÇÃO PRINCIPAL (APP VIEW)
+       ========================================== -->
+  <div id="app-view" class="app-container" style="display: none;">
+    
+    <!-- SIDEBAR -->
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <img src="/assets/logo.png" alt="São Miguel dos Campos" class="sidebar-logo">
+        <div class="sidebar-brand-text">
+          <span class="sidebar-brand-title">Controle de Frota</span>
+          <span class="sidebar-brand-subtitle">Troca de Óleo & Lubrificação</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div class="nav-section-title">Navegação Principal</div>
+        
+        <a class="nav-item active" data-section="dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Painel Geral</span>
+        </a>
+
+        <a class="nav-item" data-section="veiculos">
+          <i data-lucide="truck"></i>
+          <span>Frota de Veículos</span>
+        </a>
+
+        <a class="nav-item" data-section="trocas">
+          <i data-lucide="droplet"></i>
+          <span>Ordens de Serviço (O.S.)</span>
+        </a>
+
+        <a class="nav-item" data-section="produtos">
+          <i data-lucide="boxes"></i>
+          <span>Insumos & Almoxarifado</span>
+        </a>
+
+        <a class="nav-item" data-section="relatorios">
+          <i data-lucide="file-text"></i>
+          <span>Relatórios Oficiais</span>
+        </a>
+
+        <div class="nav-section-title admin-only">Administração</div>
+
+        <a class="nav-item admin-only" data-section="usuarios">
+          <i data-lucide="users"></i>
+          <span>Usuários & Acesso</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-snippet">
+          <div class="user-info">
+            <span class="user-name user-name-display">Carregando...</span>
+            <span class="user-role user-role-display">Operador</span>
+          </div>
+          <button id="btn-logout" class="btn-logout" title="Sair do Sistema">
+            <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL DE CONTEÚDO -->
+    <div class="app-main">
+      
+      <!-- TOP HEADER -->
+      <header class="app-header">
+        <div class="header-left">
+          <button id="btn-toggle-sidebar" class="btn-toggle-sidebar" title="Menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="page-breadcrumb">
+            <h2 id="header-page-title" class="page-title">Painel Geral de Lubrificação</h2>
+            <span id="header-page-subtitle" class="page-subtitle">Visão consolidada da frota e monitoramento preventivo</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button class="btn btn-primary btn-sm" onclick="Trocas.abrirNovaTrocaModal()">
+            <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Nova Troca de Óleo
+          </button>
+
+          <button id="btn-toggle-theme" class="theme-toggle-btn" title="Alternar Modo Escuro/Claro">
+            <span id="theme-toggle-icon"><i data-lucide="moon" style="width: 18px; height: 18px;"></i></span>
+          </button>
+        </div>
+      </header>
+
+      <!-- SEÇÕES SPA -->
+      <main class="page-content">
+        
+        <!-- 1. DASHBOARD -->
+        <section id="view-dashboard" class="section-view active">
+          
+          <!-- Grid de KPIs -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-details">
+                <span class="kpi-label">Frota Total Integrada</span>
+                <span id="kpi-total-frota" class="kpi-value">374</span>
+                <span class="kpi-subtext">Veículos cadastrados</span>
+              </div>
+              <div class="kpi-icon"><i data-lucide="truck"></i></div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-details">
+                <span class="kpi-label">Lubrificação em Dia</span>
+                <span id="kpi-em-dia" class="kpi-value" style="color: var(--status-success);">0</span>
+                <span class="kpi-subtext">Veículos regulares</span>
+              </div>
+              <div class="kpi-icon"><i data-lucide="check-circle-2"></i></div>
+            </div>
+
+            <div class="kpi-card kpi-warning">
+              <div class="kpi-details">
+                <span class="kpi-label">Próximos da Troca</span>
+                <span id="kpi-em-alerta" class="kpi-value" style="color: var(--status-warning);">0</span>
+                <span class="kpi-subtext">Atenção (500 km ou 15 dias)</span>
+              </div>
+              <div class="kpi-icon"><i data-lucide="alert-triangle"></i></div>
+            </div>
+
+            <div class="kpi-card kpi-danger">
+              <div class="kpi-details">
+                <span class="kpi-label">Trocas Vencidas</span>
+                <span id="kpi-vencidos" class="kpi-value" style="color: var(--status-danger);">0</span>
+                <span class="kpi-subtext">Atraso na manutenção</span>
+              </div>
+              <div class="kpi-icon"><i data-lucide="alert-octagon"></i></div>
+            </div>
+
+            <div class="kpi-card kpi-info">
+              <div class="kpi-details">
+                <span class="kpi-label">Trocas no Mês Atual</span>
+                <span id="kpi-trocas-mes" class="kpi-value">0</span>
+                <span class="kpi-subtext">Ordens de serviço concluídas</span>
+              </div>
+              <div class="kpi-icon"><i data-lucide="droplet"></i></div>
+            </div>
+
+            <div class="kpi-card kpi-gold">
+              <div class="kpi-details">
+                <span class="kpi-label">Volume de Óleo no Mês</span>
+                <span id="kpi-litros-mes" class="kpi-value">0 L</span>
+                <span class="kpi-subtext">Consumo total em litros</span>
+              </div>
+              <div class="kpi-icon"><i data-lucide="fuel"></i></div>
+            </div>
+          </div>
+
+          <!-- Gráficos -->
+          <div class="dashboard-grid">
+            <div class="content-card">
+              <div class="card-header-flex">
+                <div class="card-title-group">
+                  <i data-lucide="building-2"></i>
+                  <div>
+                    <h3 class="card-title">Distribuição por Secretaria Municipal</h3>
+                    <p class="card-subtitle">Volume de veículos alocados por pasta pública</p>
+                  </div>
+                </div>
+              </div>
+              <div style="height: 280px; position: relative;">
+                <canvas id="chart-secretarias"></canvas>
+              </div>
+            </div>
+
+            <div class="content-card">
+              <div class="card-header-flex">
+                <div class="card-title-group">
+                  <i data-lucide="pie-chart"></i>
+                  <div>
+                    <h3 class="card-title">Situação da Frota</h3>
+                    <p class="card-subtitle">Conformidade das trocas de óleo</p>
+                  </div>
+                </div>
+              </div>
+              <div style="height: 280px; position: relative;">
+                <canvas id="chart-status-frota"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-card">
+            <div class="card-header-flex">
+              <div class="card-title-group">
+                <i data-lucide="trending-up"></i>
+                <div>
+                  <h3 class="card-title">Evolução Mensal de Trocas de Óleo</h3>
+                  <p class="card-subtitle">Histórico de intervenções e serviços executados</p>
+                </div>
+              </div>
+            </div>
+            <div style="height: 220px; position: relative;">
+              <canvas id="chart-historico-trocas"></canvas>
+            </div>
+          </div>
+
+          <!-- Tabela de Alertas Rápidos (Veículos Críticos) -->
+          <div class="content-card">
+            <div class="card-header-flex">
+              <div class="card-title-group">
+                <i data-lucide="alert-circle" style="color: var(--status-danger);"></i>
+                <div>
+                  <h3 class="card-title">Veículos com Alerta de Troca / Pendências</h3>
+                  <p class="card-subtitle">Veículos que necessitam de intervenção imediata ou preventiva</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Placa</th>
+                    <th>Veículo</th>
+                    <th>Secretaria</th>
+                    <th>KM Atual</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-alertas-dashboard">
+                  <tr><td colspan="6" style="text-align: center; padding: 24px;"><i data-lucide="loader-2" class="spin"></i> Carregando alertas...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Últimas Trocas Concluídas -->
+          <div class="content-card">
+            <div class="card-header-flex">
+              <div class="card-title-group">
+                <i data-lucide="check-check"></i>
+                <div>
+                  <h3 class="card-title">Últimas Trocas Registradas</h3>
+                  <p class="card-subtitle">Ordens de serviço finalizadas recentemente</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>O.S.</th>
+                    <th>Veículo</th>
+                    <th>Data</th>
+                    <th>KM</th>
+                    <th>Mecânico</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-ultimas-trocas">
+                  <tr><td colspan="6" style="text-align: center; padding: 24px;"><i data-lucide="loader-2" class="spin"></i> Carregando histórico...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- 2. VEÍCULOS DA FROTA -->
+        <section id="view-veiculos" class="section-view">
+          <div class="content-card">
+            <div class="filters-bar">
+              <div class="search-input-wrapper">
+                <i data-lucide="search"></i>
+                <input type="text" id="veiculos-search" class="form-control" placeholder="Buscar por placa, modelo, marca ou código...">
+              </div>
+
+              <div style="min-width: 220px;">
+                <select id="veiculos-filter-secretaria" class="form-select">
+                  <option value="">Todas as Secretarias</option>
+                </select>
+              </div>
+
+              <div style="min-width: 170px;">
+                <select id="veiculos-filter-tipo" class="form-select">
+                  <option value="">Todos os Tipos</option>
+                </select>
+              </div>
+
+              <div style="min-width: 160px;">
+                <select id="veiculos-filter-status" class="form-select">
+                  <option value="">Todos os Status</option>
+                  <option value="REGULAR">Em Dia</option>
+                  <option value="ALERTA">Atenção</option>
+                  <option value="VENCIDO">Vencidos</option>
+                  <option value="SEM_REGISTRO">Sem Registro</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Placa</th>
+                    <th>Veículo / Modelo</th>
+                    <th>Tipo</th>
+                    <th>Secretaria</th>
+                    <th>KM Atual</th>
+                    <th>Próx. Troca</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-veiculos">
+                  <!-- Renderizado via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination-wrapper">
+              <span id="veiculos-pagination-info" class="pagination-info">Carregando...</span>
+              <div id="veiculos-pagination-controls" class="pagination-controls"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. ORDENS DE SERVIÇO & TROCAS -->
+        <section id="view-trocas" class="section-view">
+          <div class="content-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">Ordens de Serviço de Troca de Óleo</h3>
+                <p class="card-subtitle">Registros completos e histórico de manutenções realizadas</p>
+              </div>
+              <button class="btn btn-primary" onclick="Trocas.abrirNovaTrocaModal()">
+                <i data-lucide="plus" style="width: 16px; height: 16px;"></i> Registrar Nova Troca
+              </button>
+            </div>
+
+            <div class="filters-bar">
+              <div class="search-input-wrapper">
+                <i data-lucide="search"></i>
+                <input type="text" id="trocas-search" class="form-control" placeholder="Buscar por número de OS, placa, modelo ou mecânico...">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
+                <input type="date" id="trocas-filter-data-inicio" class="form-control" title="Data Inicial">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
+                <input type="date" id="trocas-filter-data-fim" class="form-control" title="Data Final">
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nº O.S.</th>
+                    <th>Data</th>
+                    <th>Veículo</th>
+                    <th>Secretaria</th>
+                    <th>KM</th>
+                    <th>Tipo</th>
+                    <th>Total</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-trocas">
+                  <!-- Renderizado via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination-wrapper">
+              <span id="trocas-pagination-info" class="pagination-info">Carregando...</span>
+              <div id="trocas-pagination-controls" class="pagination-controls"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. PRODUTOS & ESTOQUE -->
+        <section id="view-produtos" class="section-view">
+          <div class="content-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">Catálogo de Lubrificantes, Filtros e Insumos</h3>
+                <p class="card-subtitle">Almoxarifado central de manutenção da frota municipal</p>
+              </div>
+              <button class="btn btn-primary" onclick="Produtos.abrirModalNovo()">
+                <i data-lucide="plus" style="width: 16px; height: 16px;"></i> Novo Insumo
+              </button>
+            </div>
+
+            <div class="filters-bar">
+              <div class="search-input-wrapper">
+                <i data-lucide="search"></i>
+                <input type="text" id="produtos-search" class="form-control" placeholder="Buscar por produto, especificação, código ou marca...">
+              </div>
+
+              <div style="min-width: 240px;">
+                <select id="produtos-filter-categoria" class="form-select">
+                  <option value="">Todas as Categorias</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Produto / Descrição</th>
+                    <th>Categoria</th>
+                    <th>Marca</th>
+                    <th>Estoque Atual</th>
+                    <th>Estoque Mín.</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-produtos">
+                  <!-- Renderizado via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. RELATÓRIOS OFICIAIS -->
+        <section id="view-relatorios" class="section-view">
+          <div class="content-card no-print">
+            <h3 class="card-title" style="margin-bottom: 4px;">Emissão de Relatórios Oficiais</h3>
+            <p class="card-subtitle" style="margin-bottom: 20px;">Relatórios formatados para prestação de contas, auditoria e impressão timbrada</p>
+
+            <div class="filters-bar" style="background: transparent; border: none; padding: 0;">
+              <div style="min-width: 200px;">
+                <label class="form-label">Tipo de Relatório</label>
+                <select id="rel-tipo-selecionado" class="form-select">
+                  <option value="geral">Relatório Geral de Trocas</option>
+                  <option value="vencidos">Auditoria de Trocas Vencidas / Alerta</option>
+                  <option value="consumo">Consumo de Insumos & Lubrificantes</option>
+                </select>
+              </div>
+
+              <div style="min-width: 150px;">
+                <label class="form-label">Data Inicial</label>
+                <input type="date" id="rel-data-inicio" class="form-control">
+              </div>
+
+              <div style="min-width: 150px;">
+                <label class="form-label">Data Final</label>
+                <input type="date" id="rel-data-fim" class="form-control">
+              </div>
+
+              <div style="min-width: 220px;">
+                <label class="form-label">Secretaria</label>
+                <select id="rel-filter-secretaria" class="form-select">
+                  <option value="">Todas as Secretarias</option>
+                </select>
+              </div>
+
+              <div style="display: flex; gap: 8px; align-items: flex-end;">
+                <button id="btn-gerar-relatorio" class="btn btn-primary">
+                  <i data-lucide="filter" style="width: 16px; height: 16px;"></i> Gerar
+                </button>
+                <button id="btn-exportar-csv" class="btn btn-secondary" title="Exportar para Excel / CSV">
+                  <i data-lucide="download" style="width: 16px; height: 16px;"></i> CSV
+                </button>
+                <button id="btn-imprimir-relatorio" class="btn btn-secondary" title="Imprimir Relatório Oficial">
+                  <i data-lucide="printer" style="width: 16px; height: 16px;"></i> Imprimir
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resultado do Relatório -->
+          <div id="relatorio-conteudo-resultado" class="content-card">
+            <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+              Clique em "Gerar" para visualizar o relatório oficial.
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. USUÁRIOS & ACESSO (ADMIN) -->
+        <section id="view-usuarios" class="section-view admin-only">
+          <div class="content-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">Gestão de Usuários e Permissões</h3>
+                <p class="card-subtitle">Controle de acesso por login, perfis e secretarias</p>
+              </div>
+              <button id="btn-novo-usuario" class="btn btn-primary">
+                <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i> Novo Usuário
+              </button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Login</th>
+                    <th>Nome Completo</th>
+                    <th>Cargo</th>
+                    <th>Perfil</th>
+                    <th>Secretaria</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-usuarios">
+                  <!-- Renderizado via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAIS DA APLICAÇÃO
+       ========================================== -->
+
+  <!-- MODAL: NOVA TROCA DE ÓLEO / ORDEM DE SERVIÇO -->
+  <div id="modal-nova-troca" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="droplet" style="color: var(--primary-600);"></i>
+          <span>Registrar Troca de Óleo e Lubrificação (O.S.)</span>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="form-nova-troca" onsubmit="Trocas.salvarNovaTroca(event)">
+        <div class="modal-body">
+          <input type="hidden" id="troca-codigo-veiculo">
+
+          <!-- Busca e Seleção do Veículo -->
+          <div class="form-group" style="position: relative;">
+            <label class="form-label">Veículo da Frota (Placa, Modelo ou Código) *</label>
+            <div class="search-input-wrapper" style="width: 100%;">
+              <i data-lucide="truck"></i>
+              <input type="text" id="troca-busca-veiculo" class="form-control" placeholder="Digite a placa ou modelo do veículo..." autocomplete="off" required>
+            </div>
+            <div id="troca-veiculo-autocomplete-list" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 50; max-height: 220px; overflow-y: auto;"></div>
+          </div>
+
+          <!-- Card de Dados do Veículo Selecionado -->
+          <div id="troca-veiculo-info-card" style="display: none; background: rgba(5, 150, 105, 0.06); border: 1px solid var(--primary-400); border-radius: var(--radius-md); padding: 14px; margin-bottom: 16px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 0.85rem;">
+              <div><strong>Placa:</strong> <span id="troca-card-placa">-</span></div>
+              <div><strong>Modelo:</strong> <span id="troca-card-modelo">-</span></div>
+              <div><strong>Secretaria:</strong> <span id="troca-card-secretaria">-</span></div>
+              <div><strong>Plano:</strong> <span id="troca-card-plano">-</span></div>
+              <div><strong>Óleo Recomendado:</strong> <span id="troca-card-oleo-rec">-</span></div>
+              <div><strong>Capacidade Cárter:</strong> <span id="troca-card-carter">-</span></div>
+            </div>
+          </div>
+
+          <!-- Dados do Serviço -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Data do Serviço *</label>
+              <input type="date" id="troca-data-servico" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">KM Registrado no Odômetro *</label>
+              <input type="number" id="troca-km-registrado" class="form-control" placeholder="Ex: 45000" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tipo de Serviço</label>
+              <select id="troca-tipo-servico" class="form-select">
+                <option value="PREVENTIVA">Preventiva Periódica</option>
+                <option value="COMPLETA">Revisão Completa</option>
+                <option value="CORRETIVA">Corretiva</option>
+                <option value="EMERGENCIAL">Emergencial</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mecânico / Lubrificador Responsável</label>
+              <input type="text" id="troca-mecanico" class="form-control" value="Oficina / Garagem Central SMC">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Local de Execução</label>
+              <input type="text" id="troca-local-execucao" class="form-control" value="Garagem Central SMC">
+            </div>
+          </div>
+
+          <!-- Checklist de Serviços Executados -->
+          <label class="form-label" style="margin-top: 8px;">Checklist de Serviços Executados</label>
+          <div class="checklist-grid">
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-oleo-motor" checked>
+              <span>Troca Óleo do Motor</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-filtro-oleo" checked>
+              <span>Troca Filtro de Óleo</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-filtro-ar">
+              <span>Troca Filtro de Ar</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-filtro-combustivel">
+              <span>Filtro de Combustível</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-filtro-cabine">
+              <span>Filtro de Cabine / Ar</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-chassis">
+              <span>Engraxe Geral de Chassis</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-oleo-cambio">
+              <span>Óleo de Câmbio</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-oleo-diferencial">
+              <span>Óleo de Diferencial</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-fluido-freio">
+              <span>Fluido de Freio</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-arrefecimento">
+              <span>Líquido de Arrefecimento</span>
+            </label>
+          </div>
+
+          <!-- Tabela Dinâmica de Insumos e Produtos Utilizados -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+            <label class="form-label" style="margin-bottom: 0;">Insumos e Peças Utilizadas (Baixa de Estoque)</label>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="Trocas.adicionarLinhaItem()">
+              <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Adicionar Insumo
+            </button>
+          </div>
+
+          <div class="table-responsive" style="margin-top: 8px;">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Descrição do Item</th>
+                  <th>Produto do Almoxarifado</th>
+                  <th>Qtd</th>
+                  <th>Unid</th>
+                  <th>Preço Unit.</th>
+                  <th style="text-align: right;">Subtotal</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tbody-itens-troca">
+                <!-- Linhas adicionadas dinamicamente -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 10px; padding: 8px 12px; background: var(--bg-app); border-radius: var(--radius-md);">
+            <span style="font-weight: 600; font-size: 0.9rem;">Valor Total Estimado:</span>
+            <span id="troca-total-itens-display" style="font-size: 1.15rem; font-weight: 700; color: var(--primary-700);">R$ 0,00</span>
+            <input type="hidden" id="troca-valor-total" value="0">
+          </div>
+
+          <!-- Previsão da Próxima Troca -->
+          <div class="form-row" style="margin-top: 16px;">
+            <div class="form-group">
+              <label class="form-label">Próxima Troca Prevista (KM)</label>
+              <input type="number" id="troca-km-proxima" class="form-control" placeholder="Calculado automaticamente">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Próxima Troca Prevista (Data Limite)</label>
+              <input type="date" id="troca-data-proxima" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Inspeção Geral / Checklist</label>
+              <select id="troca-checklist-status" class="form-select">
+                <option value="APROVADO">Aprovado sem Observações</option>
+                <option value="COM_OBSERVACOES">Aprovado com Ressalvas</option>
+                <option value="REQUER_ATENCAO">Requer Manutenção Complementar</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Observações Técnicas / Laudo</label>
+            <textarea id="troca-observacoes" class="form-control" rows="2" placeholder="Observações sobre anel de vedação, estado de correias, vazamentos ou orientações ao motorista..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-modal-close">Cancelar</button>
+          <button type="submit" id="btn-salvar-troca" class="btn btn-primary">
+            <i data-lucide="check" style="width: 16px; height: 16px;"></i> Concluir e Salvar O.S.
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PÓS-SALVAMENTO (AÇÕES RÁPIDAS) -->
+  <div id="modal-pos-salvamento" class="modal-backdrop">
+    <div class="modal-dialog modal-sm" style="text-align: center;">
+      <div class="modal-body" style="padding: 32px 24px;">
+        <div style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--status-success);">
+          <i data-lucide="check" style="width: 32px; height: 32px;"></i>
+        </div>
+        <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Troca Registrada com Sucesso!</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Ordem de Serviço: <strong id="pos-os-numero" style="color: var(--primary-700);">-</strong></p>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button id="btn-pos-imprimir-etiqueta" class="btn btn-primary" style="width: 100%;">
+            <i data-lucide="tag" style="width: 16px; height: 16px;"></i> Imprimir Etiqueta de Para-brisa
+          </button>
+          <button id="btn-pos-imprimir-os" class="btn btn-secondary" style="width: 100%;">
+            <i data-lucide="file-text" style="width: 16px; height: 16px;"></i> Visualizar e Imprimir O.S. Completa
+          </button>
+          <button type="button" class="btn btn-secondary btn-modal-close" style="width: 100%;">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALHES DA ORDEM DE SERVIÇO (O.S.) -->
+  <div id="modal-detalhes-troca" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header no-print">
+        <div class="modal-title">
+          <i data-lucide="file-text" style="color: var(--primary-600);"></i>
+          <span>Ordem de Serviço de Lubrificação: <span id="os-det-numero">-</span></span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-primary btn-sm" onclick="window.print()">
+            <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Imprimir O.S.
+          </button>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <!-- Cabeçalho Oficial para Impressão -->
+        <div class="print-header-institucional">
+          <img src="/assets/logo.png" class="print-logo" alt="Prefeitura SMC">
+          <div class="print-title-group">
+            <div class="print-main-title">Prefeitura Municipal de São Miguel dos Campos</div>
+            <div class="print-sub-title">Secretaria Municipal de Administração • Setor de Transportes e Frota</div>
+            <div style="font-size: 10pt; font-weight: bold; color: #064e3b; margin-top: 4px;">ORDEM DE SERVIÇO DE LUBRIFICAÇÃO Nº <span id="os-det-numero-print">-</span></div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: var(--bg-app); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 16px; font-size: 0.86rem;">
+          <div><strong>Data de Execução:</strong> <span id="os-det-data">-</span></div>
+          <div><strong>Tipo de Serviço:</strong> <span id="os-det-tipo">-</span></div>
+          <div><strong>Status da O.S.:</strong> <span id="os-det-status">-</span></div>
+          <div><strong>Local:</strong> <span id="os-det-local">-</span></div>
+          <div><strong>Mecânico / Executor:</strong> <span id="os-det-mecanico">-</span></div>
+          <div><strong>KM no Momento da Troca:</strong> <span id="os-det-km">-</span></div>
+        </div>
+
+        <h4 style="font-size: 0.92rem; font-weight: 700; margin-bottom: 8px;">Dados do Veículo</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 16px; font-size: 0.86rem;">
+          <div><strong>Placa:</strong> <span id="os-det-placa">-</span></div>
+          <div><strong>Modelo / Marca:</strong> <span id="os-det-modelo">-</span></div>
+          <div><strong>Secretaria Responsável:</strong> <span id="os-det-secretaria">-</span></div>
+          <div><strong>Próxima Troca Prevista:</strong> <span id="os-det-km-prox">-</span> (<span id="os-det-data-prox">-</span>)</div>
+        </div>
+
+        <h4 style="font-size: 0.92rem; font-weight: 700; margin-bottom: 8px;">Itens e Lubrificantes Aplicados</h4>
+        <div class="table-responsive">
+          <table class="data-table print-table">
+            <thead>
+              <tr>
+                <th>Item / Especificação</th>
+                <th>Marca</th>
+                <th>Quantidade</th>
+                <th>Valor Unitário</th>
+                <th style="text-align: right;">Total</th>
+              </tr>
+            </thead>
+            <tbody id="os-det-tbody-itens">
+              <!-- Itens carregados via JS -->
+            </tbody>
+            <tfoot>
+              <tr>
+                <th colspan="4" style="text-align: right;">Valor Total do Serviço:</th>
+                <th id="os-det-total" style="text-align: right; font-size: 1rem; color: var(--primary-700);">R$ 0,00</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <h4 style="font-size: 0.92rem; font-weight: 700; margin: 16px 0 8px;">Resumo dos Serviços</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; font-size: 0.8rem; margin-bottom: 14px;">
+          <div>Óleo do Motor: <strong id="os-chk-motor">-</strong></div>
+          <div>Filtro de Óleo: <strong id="os-chk-filtro-oleo">-</strong></div>
+          <div>Filtro de Ar: <strong id="os-chk-filtro-ar">-</strong></div>
+          <div>Filtro Combustível: <strong id="os-chk-filtro-comb">-</strong></div>
+          <div>Filtro de Cabine: <strong id="os-chk-filtro-cab">-</strong></div>
+          <div>Engraxe de Chassis: <strong id="os-chk-chassis">-</strong></div>
+        </div>
+
+        <div style="font-size: 0.84rem; background: var(--bg-app); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <strong>Observações Técnicas:</strong> <span id="os-det-obs">-</span>
+        </div>
+
+        <div class="print-signatures print-only">
+          <div class="signature-box">
+            Mecânico / Executor do Serviço<br>Oficina Municipal SMC
+          </div>
+          <div class="signature-box">
+            Motorista / Responsável pelo Veículo<br>Ciente
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ETIQUETA DE PARA-BRISA (ADESIVO) -->
+  <div id="modal-etiqueta-oleo" class="modal-backdrop">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header no-print">
+        <div class="modal-title">
+          <i data-lucide="tag" style="color: var(--primary-600);"></i>
+          <span>Etiqueta de Para-brisa</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-primary btn-sm" onclick="window.print()">
+            <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Imprimir Etiqueta
+          </button>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+      </div>
+
+      <div class="modal-body" style="padding: 20px;">
+        <!-- Card Etiqueta Formatado para Adesivo -->
+        <div class="print-etiqueta-wrapper" style="border: 2px dashed var(--primary-600); border-radius: 10px; padding: 14px; background: #ffffff; color: #0f172a; box-shadow: var(--shadow-sm);">
+          <div class="etiqueta-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #064e3b; padding-bottom: 8px; margin-bottom: 10px;">
+            <img src="/assets/logo.png" style="max-height: 38px;" alt="SMC">
+            <div style="text-align: right;">
+              <div style="font-size: 9pt; font-weight: 800; color: #064e3b; text-transform: uppercase;">CONTROLE DE ÓLEO</div>
+              <div style="font-size: 7pt; color: #64748b;">São Miguel dos Campos - AL</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 8.5pt;">
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px;">
+              <div style="font-size: 6.5pt; color: #64748b; font-weight: bold;">PLACA</div>
+              <div id="lbl-etiqueta-placa" style="font-size: 11pt; font-weight: 800; color: #0f172a;">-</div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px;">
+              <div style="font-size: 6.5pt; color: #64748b; font-weight: bold;">Nº DA O.S.</div>
+              <div id="lbl-etiqueta-os" style="font-size: 9pt; font-weight: bold; color: #064e3b;">-</div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px;">
+              <div style="font-size: 6.5pt; color: #64748b; font-weight: bold;">DATA DA TROCA</div>
+              <div id="lbl-etiqueta-data-troca" style="font-size: 9.5pt; font-weight: bold;">-</div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px;">
+              <div style="font-size: 6.5pt; color: #64748b; font-weight: bold;">KM DA TROCA</div>
+              <div id="lbl-etiqueta-km-troca" style="font-size: 9.5pt; font-weight: bold;">-</div>
+            </div>
+
+            <!-- Destaque Próxima Troca -->
+            <div style="grid-column: span 2; background: #ecfdf5; border: 1.5px solid #059669; padding: 8px 10px; border-radius: 6px; text-align: center;">
+              <div style="font-size: 7pt; color: #065f46; font-weight: 800; text-transform: uppercase;">PRÓXIMA TROCA DE ÓLEO</div>
+              <div style="display: flex; justify-content: space-around; margin-top: 4px;">
+                <div>
+                  <span style="font-size: 6.5pt; color: #047857; display: block;">KM LIMITE:</span>
+                  <span id="lbl-etiqueta-km-prox" style="font-size: 12pt; font-weight: 900; color: #064e3b;">-</span>
+                </div>
+                <div style="border-left: 1px solid #a7f3d0; padding-left: 12px;">
+                  <span style="font-size: 6.5pt; color: #047857; display: block;">DATA LIMITE:</span>
+                  <span id="lbl-etiqueta-data-prox" style="font-size: 11pt; font-weight: 800; color: #064e3b;">-</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="grid-column: span 2; font-size: 7pt; color: #64748b; padding-top: 4px; border-top: 1px solid #e2e8f0;">
+              <div><strong>Veículo:</strong> <span id="lbl-etiqueta-modelo">-</span> | <span id="lbl-etiqueta-secretaria">-</span></div>
+              <div><strong>Insumos:</strong> <span id="lbl-etiqueta-itens">-</span></div>
+              <div style="margin-top: 2px;"><strong>Mecânico:</strong> <span id="lbl-etiqueta-mecanico">-</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALHES DO VEÍCULO & HISTÓRICO -->
+  <div id="modal-detalhes-veiculo" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header no-print">
+        <div class="modal-title">
+          <i data-lucide="truck" style="color: var(--primary-600);"></i>
+          <span>Ficha do Veículo: <span id="det-veiculo-placa">-</span></span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary btn-sm" onclick="Veiculos.imprimirFichaHistorica()">
+            <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Imprimir Ficha
+          </button>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="print-header-institucional print-only">
+          <img src="/assets/logo.png" class="print-logo" alt="SMC">
+          <div class="print-title-group">
+            <div class="print-main-title">Prefeitura Municipal de São Miguel dos Campos</div>
+            <div class="print-sub-title">Ficha Histórica de Manutenção & Lubrificação do Veículo</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 id="det-veiculo-modelo" style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700;">-</h3>
+            <span id="det-veiculo-secretaria" style="font-size: 0.85rem; color: var(--text-muted);">-</span>
+          </div>
+          <div id="det-veiculo-status"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; background: var(--bg-app); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 20px; font-size: 0.85rem;">
+          <div><strong>Tipo de Veículo:</strong> <span id="det-veiculo-tipo">-</span></div>
+          <div><strong>Ano Fab/Modelo:</strong> <span id="det-veiculo-ano">-</span></div>
+          <div><strong>Situação Cadastral:</strong> <span id="det-veiculo-situacao">-</span></div>
+        </div>
+
+        <!-- Plano Recomendado -->
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">Especificações de Lubrificação Recomendadas</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; background: rgba(5, 150, 105, 0.05); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--primary-400); margin-bottom: 20px; font-size: 0.85rem;">
+          <div><strong>Plano:</strong> <span id="det-plano-nome">-</span></div>
+          <div><strong>Óleo Recomendado:</strong> <span id="det-plano-oleo">-</span></div>
+          <div><strong>Capacidade Cárter:</strong> <span id="det-plano-carter">-</span></div>
+          <div><strong>Intervalo Padrão:</strong> <span id="det-plano-intervalo">-</span></div>
+        </div>
+
+        <!-- Formulário de Atualização de Odômetro / Configuração -->
+        <h4 class="no-print" style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">Atualização de Odômetro & Configurações</h4>
+        <div class="no-print" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px;">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">KM Atual (Odômetro)</label>
+              <input type="number" id="det-km-atual" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Motorista Responsável</label>
+              <input type="text" id="det-motorista" class="form-control" placeholder="Nome do motorista">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Local / Garagem Habitual</label>
+              <input type="text" id="det-garagem" class="form-control" placeholder="Garagem Central, SMTT, etc.">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Observações sobre o Veículo</label>
+            <input type="text" id="det-obs-config" class="form-control" placeholder="Histórico prévio, manutenções adicionais...">
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="Veiculos.salvarConfig()">
+            <i data-lucide="save" style="width: 14px; height: 14px;"></i> Salvar Dados do Veículo
+          </button>
+        </div>
+
+        <!-- Histórico de Trocas Realizadas -->
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">Histórico de Trocas de Óleo & Lubrificações</h4>
+        <div class="table-responsive">
+          <table class="data-table print-table">
+            <thead>
+              <tr>
+                <th>Nº O.S.</th>
+                <th>Data</th>
+                <th>KM</th>
+                <th>Mecânico</th>
+                <th>Valor</th>
+                <th class="no-print">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-historico-veiculo">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVO / EDITAR PRODUTO -->
+  <div id="modal-produto" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="box" style="color: var(--primary-600);"></i>
+          <span id="prod-modal-title">Novo Insumo / Lubrificante</span>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="form-produto" onsubmit="Produtos.salvarProduto(event)">
+        <div class="modal-body">
+          <input type="hidden" id="prod-form-id">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Categoria do Produto *</label>
+              <select id="prod-form-categoria" class="form-select" required>
+                <!-- Categorias -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Código Interno</label>
+              <input type="text" id="prod-form-codigo" class="form-control" placeholder="Ex: OLEO-15W40">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nome do Produto / Descrição Completa *</label>
+            <input type="text" id="prod-form-nome" class="form-control" placeholder="Ex: Óleo Lubrax Top Turbo 15W40 Mineral" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Marca / Fabricante</label>
+              <input type="text" id="prod-form-marca" class="form-control" placeholder="Ex: Lubrax, Shell, Mann">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Especificação Técnica</label>
+              <input type="text" id="prod-form-spec" class="form-control" placeholder="Ex: API CI-4 / ACEA E7">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Unidade de Medida</label>
+              <select id="prod-form-unidade" class="form-select">
+                <option value="LITRO">LITRO</option>
+                <option value="UNIDADE">UNIDADE</option>
+                <option value="KG">KG</option>
+                <option value="TAMBOR 200L">TAMBOR 200L</option>
+                <option value="BALDE 20L">BALDE 20L</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estoque Mínimo de Alerta</label>
+              <input type="number" id="prod-form-estoque-min" class="form-control" value="10">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Valor Unitário Estimado (R$)</label>
+              <input type="number" step="0.01" id="prod-form-valor" class="form-control" value="0.00">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Observações</label>
+            <textarea id="prod-form-obs" class="form-control" rows="2" placeholder="Instruções de aplicação..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-modal-close">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Produto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: AJUSTE / ENTRADA DE ESTOQUE -->
+  <div id="modal-ajuste-estoque" class="modal-backdrop">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="package-plus" style="color: var(--primary-600);"></i>
+          <span>Movimentação de Estoque</span>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="form-ajuste-estoque" onsubmit="Produtos.salvarAjusteEstoque(event)">
+        <div class="modal-body">
+          <input type="hidden" id="ajuste-prod-id">
+
+          <div style="background: var(--bg-app); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 16px;">
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Produto Selecionado:</div>
+            <div id="ajuste-prod-nome" style="font-weight: 700; font-size: 0.95rem;">-</div>
+            <div style="font-size: 0.8rem; margin-top: 4px;">Saldo Atual: <strong id="ajuste-prod-saldo-atual" style="color: var(--primary-700);">-</strong></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tipo de Movimentação *</label>
+            <select id="ajuste-tipo" class="form-select" required>
+              <option value="ENTRADA">Entrada / Recebimento de Compra</option>
+              <option value="SAIDA_MANUAL">Saída Manual / Descarte</option>
+              <option value="AJUSTE_INVENTARIO">Ajuste de Balanço / Inventário Físico</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Quantidade *</label>
+            <input type="number" step="0.5" id="ajuste-qtd" class="form-control" placeholder="Ex: 50" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nº Nota Fiscal / Documento</label>
+            <input type="text" id="ajuste-doc" class="form-control" placeholder="Ex: NF 12345 / SMC">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Motivo / Observações</label>
+            <input type="text" id="ajuste-obs" class="form-control" placeholder="Ex: Recebimento do fornecedor">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-modal-close">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Lançar Estoque</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: USUÁRIO -->
+  <div id="modal-usuario" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="user" style="color: var(--primary-600);"></i>
+          <span id="user-modal-title">Novo Usuário</span>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="form-usuario" onsubmit="Usuarios.salvarUsuario(event)">
+        <div class="modal-body">
+          <input type="hidden" id="user-form-id">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Login de Acesso *</label>
+              <input type="text" id="user-form-login" class="form-control" placeholder="Ex: joao.silva" required>
+            </div>
+
+            <div id="user-group-senha" class="form-group">
+              <label class="form-label">Senha Inicial *</label>
+              <input type="password" id="user-form-senha" class="form-control" placeholder="Mínimo 6 caracteres">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nome Completo *</label>
+            <input type="text" id="user-form-nome" class="form-control" placeholder="Ex: João da Silva" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">E-mail Institucional</label>
+              <input type="email" id="user-form-email" class="form-control" placeholder="email@saomigueldoscampos.al.gov.br">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Cargo / Função</label>
+              <input type="text" id="user-form-cargo" class="form-control" placeholder="Ex: Lubrificador, Mecânico, Gestor">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Perfil de Acesso *</label>
+              <select id="user-form-perfil" class="form-select" required>
+                <option value="OPERADOR">Operador (Registro de Trocas & Estoque)</option>
+                <option value="GESTOR">Gestor de Frota (Consultas & Relatórios)</option>
+                <option value="ADMIN">Administrador Geral</option>
+                <option value="CONSULTA">Somente Consulta</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="user-form-ativo" class="form-select">
+                <option value="S">Ativo</option>
+                <option value="N">Inativo / Bloqueado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-modal-close">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Usuário</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts da Aplicação -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script src="/js/veiculos.js"></script>
+  <script src="/js/trocas.js"></script>
+  <script src="/js/produtos.js"></script>
+  <script src="/js/relatorios.js"></script>
+  <script src="/js/usuarios.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

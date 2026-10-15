@@ -1,0 +1,19 @@
+# Configuração do Render Blueprint para o Sistema de Controle de Lubrificação - SMC
+services:
+  - type: web
+    name: lubrificacaosmc
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: PORT
+        value: "10000"
+      - key: JWT_SECRET
+        sync: false # Gere um segredo JWT no painel do Render
+      - key: LUBRIFICACAO_API_URL
+        value: http://nstech.ddns.net:8086/lubrificacao-api # Endereço público/DDNS do seu Tomcat
+      - key: LUBRIFICACAO_API_SECRET
+        sync: false # Segredo configurado em lubrificacao-api.xml no Tomcat

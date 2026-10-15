@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Exemplo de configuração da SMC Lubrificacao API no Tomcat.
+  Copie para: $CATALINA_BASE/conf/Catalina/localhost/lubrificacao-api.xml
+-->
+<Context>
+  <!-- Conexão Oracle -->
+  <Parameter name="DB_URL"      value="jdbc:oracle:thin:@SEU_IP_OU_HOST:1521/XE" override="false"/>
+  <Parameter name="DB_USER"     value="c##nstecholeo" override="false"/>
+  <Parameter name="DB_PASSWORD" value="SUA_SENHA_AQUI" override="false"/>
+  <Parameter name="DB_POOL_SIZE" value="10" override="false"/>
+  <Parameter name="DB_QUERY_TIMEOUT_SECONDS" value="120" override="false"/>
+
+  <!-- Segredo compartilhado com o Node no Render (variável LUBRIFICACAO_API_SECRET) -->
+  <Parameter name="API_SECRET" value="INSIRA_SEU_SEGREDO_DE_PRODUCAO_AQUI" override="false"/>
+
+  <!-- Restrição de IP (opcional). Vazio = qualquer IP (ainda exige autenticação) -->
+  <Parameter name="ALLOWED_IPS" value="" override="false"/>
+
+  <Parameter name="RATE_LIMIT_PER_MINUTE" value="1200" override="false"/>
+  <Parameter name="MAX_ROWS" value="50000" override="false"/>
+</Context>

@@ -1,0 +1,204 @@
+/* ==========================================================================
+   ESTILOS DE IMPRESSÃO OFICIAL & ETIQUETAS
+   Prefeitura Municipal de São Miguel dos Campos - Alagoas
+   ========================================================================== */
+
+@media print {
+  /* Ocultar elementos da interface web */
+  .app-sidebar,
+  .app-header,
+  .btn,
+  .filters-bar,
+  .pagination-wrapper,
+  .theme-toggle-btn,
+  .modal-close-btn,
+  .modal-footer,
+  .toast-container,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+
+  .app-main, .page-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  .modal-backdrop {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .modal-dialog {
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .modal-header, .modal-body {
+    padding: 0 !important;
+    background: #ffffff !important;
+    border: none !important;
+  }
+
+  /* Timbrado Oficial da Prefeitura */
+  .print-header-institucional {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #064e3b;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+
+  .print-logo {
+    max-height: 65px;
+    width: auto;
+  }
+
+  .print-title-group {
+    text-align: right;
+  }
+
+  .print-main-title {
+    font-size: 13pt;
+    font-weight: bold;
+    color: #064e3b;
+    text-transform: uppercase;
+  }
+
+  .print-sub-title {
+    font-size: 9pt;
+    color: #475569;
+  }
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+  }
+
+  .print-table th, .print-table td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 8px;
+    font-size: 9.5pt;
+  }
+
+  .print-table th {
+    background-color: #f1f5f9 !important;
+    color: #0f172a;
+    font-weight: bold;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-signatures {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 50px;
+    page-break-inside: avoid;
+  }
+
+  .signature-box {
+    text-align: center;
+    width: 200px;
+    border-top: 1px solid #000000;
+    padding-top: 6px;
+    font-size: 9pt;
+  }
+
+  /* ==========================================================================
+     FORMATO ESPECÍFICO: ETIQUETA DE PARA-BRISA (ADESIVO)
+     Tamanho aproximado: 70mm x 50mm
+     ========================================================================== */
+  .print-etiqueta-wrapper {
+    display: block !important;
+    width: 85mm;
+    margin: 0 auto;
+    border: 2px dashed #064e3b;
+    border-radius: 8px;
+    padding: 10px;
+    background: #ffffff;
+    page-break-inside: avoid;
+    box-sizing: border-box;
+  }
+
+  .etiqueta-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #064e3b;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+  }
+
+  .etiqueta-logo {
+    max-height: 32px;
+  }
+
+  .etiqueta-title {
+    font-size: 8pt;
+    font-weight: bold;
+    color: #064e3b;
+    line-height: 1.1;
+  }
+
+  .etiqueta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    font-size: 8pt;
+  }
+
+  .etiqueta-field {
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 4px 6px;
+    background: #f8fafc;
+  }
+
+  .etiqueta-field-highlight {
+    background: #ecfdf5;
+    border-color: #059669;
+    grid-column: span 2;
+  }
+
+  .etiqueta-field-label {
+    font-size: 6.5pt;
+    color: #475569;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  .etiqueta-field-val {
+    font-size: 9pt;
+    font-weight: bold;
+    color: #0f172a;
+  }
+
+  .etiqueta-footer {
+    font-size: 6.5pt;
+    text-align: center;
+    margin-top: 6px;
+    color: #64748b;
+  }
+}
+
+/* Ocultar elementos de impressão na tela padrão */
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
